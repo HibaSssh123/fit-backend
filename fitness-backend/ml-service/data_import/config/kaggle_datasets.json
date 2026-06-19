@@ -1,0 +1,96 @@
+{
+  "datasets": [
+    {
+      "id": 1,
+      "name": "edqian/gym-exercises",
+      "type": "exercises",
+      "description": "Comprehensive gym exercise dataset with exercises and muscle groups",
+      "source": "Kaggle",
+      "license": "CC0: Public Domain",
+      "featured": true,
+      "size_mb": 3,
+      "csv_file": "exercises.csv",
+      "columns": {
+        "name": "title",
+        "type": "type",
+        "category": "target",
+        "description": "description",
+        "target_muscles": "target",
+        "equipment": "equipment"
+      },
+      "notes": "Primary source for exercise data. Contains exercise definitions with target muscles and equipment types."
+    },
+    {
+      "id": 2,
+      "name": "openfoodfacts/food-products-open-database",
+      "type": "nutrition",
+      "description": "Open Food Facts database with comprehensive nutrition information",
+      "source": "Kaggle",
+      "license": "ODbL (Open Data Commons)",
+      "featured": false,
+      "size_mb": 45,
+      "csv_file": "products.csv",
+      "columns": {
+        "name": "product_name",
+        "calories": "energy_kcal_100g",
+        "protein": "proteins_100g",
+        "carbs": "carbohydrates_100g",
+        "fat": "fat_100g",
+        "serving_unit": "serving_unit"
+      },
+      "notes": "Comprehensive food products database. Contains standardized nutrition facts per 100g. Pre-filtered to include only items with complete nutrition data."
+    },
+    {
+      "id": 3,
+      "name": "iamshadmirza/fitness-tracker-data",
+      "type": "workouts",
+      "description": "Real user fitness tracking data with workout patterns",
+      "source": "Kaggle",
+      "license": "CC0: Public Domain",
+      "featured": true,
+      "size_mb": 8,
+      "csv_file": "fitness_data.csv",
+      "columns": {
+        "user_id": "user_id",
+        "date": "date",
+        "duration": "duration",
+        "calories_burned": "calories_burned",
+        "exercise_type": "type"
+      },
+      "notes": "Real fitness tracking data. Optional for analysis and model training."
+    }
+  ],
+  "data_transforms": {
+    "exercises": {
+      "required_columns": ["name", "type"],
+      "optional_columns": ["category", "description", "targetMuscles"],
+      "type_mapping": {
+        "strength": "STRENGTH",
+        "cardio": "CARDIO",
+        "flexibility": "CARDIO",
+        "stretching": "CARDIO"
+      },
+      "serving_units": ["GRAM", "OUNCE", "CUP", "PIECE", "SERVING"]
+    },
+    "nutrition": {
+      "required_columns": ["name", "calories"],
+      "optional_columns": ["protein", "carbs", "fat", "defaultServingUnit"],
+      "serving_unit_mapping": {
+        "g": "GRAM",
+        "gram": "GRAM",
+        "oz": "OUNCE",
+        "ounce": "OUNCE",
+        "cup": "CUP",
+        "piece": "PIECE",
+        "pcs": "PIECE",
+        "serving": "SERVING"
+      }
+    }
+  },
+  "seed_options": {
+    "batch_size": 1000,
+    "on_duplicate": "skip",
+    "validate_before_seed": true,
+    "generate_logs": true
+  }
+}
