@@ -1,5 +1,11 @@
+import { ApiProperty } from '@nestjs/swagger';
+import { IsString, MinLength } from 'class-validator';
+
 export class CreateChatMessageDto {
-  message: string;
+  @ApiProperty({ example: 'Should I eat more protein?' })
+  @IsString()
+  @MinLength(1)
+  message!: string;
 }
 
 export interface ChatMessageResponse {

@@ -10,6 +10,7 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
+import { ApiBearerAuth, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import type { Request } from 'express';
 import { ExerciseType } from '@prisma/client';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
@@ -19,12 +20,15 @@ import { WorkoutsService } from './workouts.service';
 
 type AuthedRequest = Request & { user: { sub: string } };
 
+@ApiTags('Workouts')
+@ApiBearerAuth()
 @Controller('workouts')
 @UseGuards(JwtAuthGuard)
 export class WorkoutsController {
   constructor(private readonly workoutsService: WorkoutsService) {}
 
   @Post()
+  @ApiOperation({ summary: 'Create a workout with exercises and sets' })
   create(
     @Req() req: AuthedRequest,
     @Body() createWorkoutDto: CreateWorkoutDto,
@@ -33,6 +37,13 @@ export class WorkoutsController {
   }
 
   @Get()
+  @ApiOperation({ summary: 'List workouts with filters and pagination' })
+  @ApiQuery({ name: 'startDate', required: false })
+  @ApiQuery({ name: 'endDate', required: false })
+  @ApiQuery({ name: 'page', required: false, type: Number })
+  @ApiQuery({ name: 'limit', required: false, type: Number })
+  @ApiQuery({ name: 'type', required: false, enum: ExerciseType })
+  @ApiQuery({ name: 'muscleGroup', required: false })
   list(
     @Req() req: AuthedRequest,
     @Query('startDate') startDate?: string,
@@ -53,6 +64,8 @@ export class WorkoutsController {
   }
 
   @Get('summary')
+  @ApiOperation({ summary: 'Get workout statistics for a period' })
+  @ApiQuery({ name: 'period', required: false, enum: ['week', 'month'] })
   getSummary(
     @Req() req: AuthedRequest,
     @Query('period') period?: 'week' | 'month',
@@ -61,11 +74,13 @@ export class WorkoutsController {
   }
 
   @Get(':id')
+  @ApiOperation({ summary: 'Get workout by ID' })
   getById(@Req() req: AuthedRequest, @Param('id') id: string) {
     return this.workoutsService.getById(req.user.sub, id);
   }
 
   @Patch(':id')
+  @ApiOperation({ summary: 'Update a workout' })
   update(
     @Req() req: AuthedRequest,
     @Param('id') id: string,
@@ -75,6 +90,7 @@ export class WorkoutsController {
   }
 
   @Delete(':id')
+  @ApiOperation({ summary: 'Delete a workout' })
   remove(@Req() req: AuthedRequest, @Param('id') id: string) {
     return this.workoutsService.remove(req.user.sub, id);
   }

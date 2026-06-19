@@ -7,20 +7,23 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
+import { ApiBearerAuth, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { AdminGuard } from './admin.guard';
 import { AdminService } from './admin.service';
 
+@ApiTags('Admin')
+@ApiBearerAuth()
 @Controller('admin')
 @UseGuards(JwtAuthGuard, AdminGuard)
 export class AdminController {
   constructor(private readonly adminService: AdminService) {}
 
-  /**
-   * Get all users
-   * GET /admin/users?page=1&limit=10&role=USER
-   */
   @Get('users')
+  @ApiOperation({ summary: 'List all users (paginated)' })
+  @ApiQuery({ name: 'page', required: false, type: Number })
+  @ApiQuery({ name: 'limit', required: false, type: Number })
+  @ApiQuery({ name: 'role', required: false, enum: ['USER', 'ADMIN'] })
   getUsers(
     @Query('page') page?: string,
     @Query('limit') limit?: string,
@@ -33,56 +36,38 @@ export class AdminController {
     );
   }
 
-  /**
-   * Get admin analytics dashboard
-   * GET /admin/analytics
-   */
   @Get('analytics')
+  @ApiOperation({ summary: 'Get platform analytics' })
   getAnalytics() {
     return this.adminService.getAnalytics();
   }
 
-  /**
-   * Ban a user
-   * PATCH /admin/users/:id/ban
-   */
   @Patch('users/:id/ban')
+  @ApiOperation({ summary: 'Ban a user' })
   banUser(@Param('id') userId: string) {
     return this.adminService.toggleUserStatus(userId, false);
   }
 
-  /**
-   * Unban a user
-   * PATCH /admin/users/:id/unban
-   */
   @Patch('users/:id/unban')
+  @ApiOperation({ summary: 'Unban a user' })
   unbanUser(@Param('id') userId: string) {
     return this.adminService.toggleUserStatus(userId, true);
   }
 
-  /**
-   * Delete a user
-   * DELETE /admin/users/:id
-   */
   @Delete('users/:id')
+  @ApiOperation({ summary: 'Delete a user' })
   deleteUser(@Param('id') userId: string) {
     return this.adminService.deleteUser(userId);
   }
 
-  /**
-   * Promote a user to admin
-   * PATCH /admin/users/:id/promote
-   */
   @Patch('users/:id/promote')
+  @ApiOperation({ summary: 'Promote user to admin' })
   promoteToAdmin(@Param('id') userId: string) {
     return this.adminService.promoteToAdmin(userId);
   }
 
-  /**
-   * Demote an admin to user
-   * PATCH /admin/users/:id/demote
-   */
   @Patch('users/:id/demote')
+  @ApiOperation({ summary: 'Demote admin to user' })
   demoteFromAdmin(@Param('id') userId: string) {
     return this.adminService.demoteFromAdmin(userId);
   }

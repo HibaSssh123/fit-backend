@@ -8,6 +8,7 @@ import {
   UseGuards,
   Query,
 } from '@nestjs/common';
+import { ApiBearerAuth, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import type { Request } from 'express';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { ChatbotService } from './chatbot.service';
@@ -15,17 +16,15 @@ import { CreateChatMessageDto } from './chatbot.dto';
 
 type AuthedRequest = Request & { user: { sub: string } };
 
+@ApiTags('Chatbot')
+@ApiBearerAuth()
 @Controller('chat')
 @UseGuards(JwtAuthGuard)
 export class ChatbotController {
   constructor(private readonly chatbotService: ChatbotService) {}
 
-  /**
-   * Send a message to the fitness chatbot
-   * POST /chat
-   * Body: { message: "Should I eat more protein?" }
-   */
   @Post()
+  @ApiOperation({ summary: 'Send a message to the fitness chatbot' })
   async sendMessage(
     @Req() req: AuthedRequest,
     @Body() createChatMessageDto: CreateChatMessageDto,
@@ -36,21 +35,16 @@ export class ChatbotController {
     );
   }
 
-  /**
-   * Get conversation history
-   * GET /chat/history?limit=50
-   */
   @Get('history')
+  @ApiOperation({ summary: 'Get conversation history' })
+  @ApiQuery({ name: 'limit', required: false, type: Number, example: 50 })
   async getHistory(@Req() req: AuthedRequest, @Query('limit') limit?: string) {
     const limitNum = limit ? parseInt(limit, 10) : 50;
     return this.chatbotService.getConversationHistory(req.user.sub, limitNum);
   }
 
-  /**
-   * Clear conversation history
-   * DELETE /chat/history
-   */
   @Delete('history')
+  @ApiOperation({ summary: 'Clear conversation history' })
   async clearHistory(@Req() req: AuthedRequest) {
     return this.chatbotService.clearConversationHistory(req.user.sub);
   }
